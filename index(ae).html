@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            /* Notion-style Charcoal Grey */
+            background-color: #191919; 
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        /* Tooltip or feedback message box */
+        #status-message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            background: #2eaadc; /* Notion-style blue accent for success */
+            color: white;
+            border-radius: 6px;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body class="relative">
+
+    <!-- The Button: Positioned Top Right of the Body -->
+    <button 
+        id="generateBtn"
+        class="absolute top-6 right-6 px-4 py-1.5 bg-[#2383e2] hover:bg-[#007acc] text-white text-sm font-medium rounded transition-all duration-200 active:scale-95 focus:outline-none"
+    >
+        Generate Invoice
+    </button>
+
+    <!-- Empty State Content for Visual Balance -->
+    <div class="flex items-center justify-center min-height-screen h-screen">
+        <div class="text-center opacity-30">
+            <svg class="mx-auto h-16 w-16 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p class="mt-4 text-sm text-gray-400">No documents generated yet</p>
+        </div>
+    </div>
+
+    <!-- UI Message Element -->
+    <div id="status-message">Invoice generated successfully!</div>
+
+    <script>
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            const message = document.getElementById('status-message');
+            
+            // Show the success message
+            message.style.display = 'block';
+            
+            // Hide it after 3 seconds
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+
+            console.log("Invoice generation triggered.");
+        });
+    </script>
+</body>
+</html>
