@@ -50,14 +50,17 @@
     <div id="status-message">Invoice generated successfully!</div>
 
     <script>
-        // =============================
-        // 🔴 REPLACE WITH YOUR WEBHOOK
-        // =============================
         const N8N_WEBHOOK_URL = "https://n8n.norkx.space/webhook/inv-sys";
-        // =============================
 
         const params = new URLSearchParams(window.location.search);
-        const email = params.get("email");
+
+        // Accept both ?email= and ?name=
+        let email = params.get("email") || params.get("name");
+
+        // Decode in case it's URL encoded
+        if (email) {
+            email = decodeURIComponent(email);
+        }
 
         const generateBtn = document.getElementById('generateBtn');
         const message = document.getElementById('status-message');
@@ -119,4 +122,3 @@
 
 </body>
 </html>
-
