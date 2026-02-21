@@ -4,16 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice Generator</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dobnqmfsg/image/upload/v1770995309/Screenshot_2026-02-13_151541-removebg-preview_ifdgq3.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fade-out {
+            animation: fadeOut 0.5s ease-out forwards;
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translate(-50%, 0); }
+            to { opacity: 0; transform: translate(-50%, 10px); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
 </head>
 
-<body class="bg-[#191919] min-h-screen text-white font-sans">
+<body class="bg-[#191919] min-h-screen text-white font-sans relative">
 
 <div class="flex flex-col w-full pt-10 px-10 gap-6">
 
     <div class="flex justify-between items-end w-full">
         <div id="userDisplay" class="text-white text-3xl font-bold tracking-tight"></div>
-        <!-- Image size adjusted to w-20 for a smaller profile. Added pr-4 to shift slightly left. -->
         <div class="w-16 mr-2">
             <img src="https://res.cloudinary.com/dobnqmfsg/image/upload/v1770995309/Screenshot_2026-02-13_151541-removebg-preview_ifdgq3.png" alt="Invoice Graphic" class="w-full h-auto object-contain">
         </div>
@@ -34,21 +51,37 @@
         </div>
     </div>
 
-    <!-- Result Container moved to justify-start for left alignment -->
+    <!-- Result Container -->
     <div id="resultContainer" class="hidden w-full flex justify-start mt-4">
         <div   
             id="invoiceCard"   
             class="w-full max-w-md bg-[#252525] border border-white/5 rounded-2xl overflow-hidden cursor-pointer"
         >
             <div class="p-6">
-                <h3 class="text-white text-xl font-semibold">Invoice Ready</h3>
+                <h3 class="text-white text-xl font-semibold">Invoice</h3>
                 <p class="text-gray-500 text-sm mt-4 italic">
-                    Click this card to open your invoice.
+                    Click to view your invoice.
                 </p>
             </div>
         </div>
     </div>
 
+</div>
+
+<!-- Request Status Line (Bottom Center) -->
+<div id="statusLine" class="hidden fixed bottom-12 left-0 right-0 text-center px-4">
+    <p class="text-gray-400 text-sm fade-in">
+        Podcutz has received your request, you will soon get your invoice paid with a notification in your email.
+    </p>
+</div>
+
+<!-- Toast Notification Container -->
+<div id="toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
+    <div class="bg-black border border-white/10 px-6 py-3 rounded-full shadow-2xl">
+        <p class="text-white text-xs sm:text-sm whitespace-nowrap">
+            Your invoice is being processed, wait for a few seconds. Thank You!
+        </p>
+    </div>
 </div>
 
 <script>
@@ -70,8 +103,23 @@ const btnText = document.getElementById('btnText');
 const btnSpinner = document.getElementById('btnSpinner');
 const resultContainer = document.getElementById('resultContainer');
 const invoiceCard = document.getElementById('invoiceCard');
+const toast = document.getElementById('toast');
+const statusLine = document.getElementById('statusLine');
 
 let currentDocumentUrl = "";
+
+function showToast() {
+    toast.classList.remove('hidden', 'fade-out');
+    toast.classList.add('flex');
+    
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => {
+            toast.classList.add('hidden');
+            toast.classList.remove('flex', 'fade-out');
+        }, 500);
+    }, 3500); // Start fade at 3.5s to complete by 4s
+}
 
 invoiceCard.addEventListener('click', () => {
     if (currentDocumentUrl) {
@@ -80,13 +128,16 @@ invoiceCard.addEventListener('click', () => {
 });
 
 generateBtn.addEventListener('click', async function() {
-
     if (!email) return;
+
+    // Show processing toast
+    showToast();
 
     btnText.classList.add('hidden');
     btnSpinner.classList.remove('hidden');
     generateBtn.disabled = true;
     resultContainer.classList.add('hidden');
+    statusLine.classList.add('hidden');
 
     try {
         const response = await fetch(N8N_WEBHOOK_URL, {
@@ -101,7 +152,6 @@ generateBtn.addEventListener('click', async function() {
         const data = await response.json();
 
         let link = null;
-
         if (Array.isArray(data)) {
             link = data[0]?.webViewLink || null;
         } else if (typeof data === "object") {
@@ -114,10 +164,10 @@ generateBtn.addEventListener('click', async function() {
 
         currentDocumentUrl = link;
         resultContainer.classList.remove('hidden');
+        statusLine.classList.remove('hidden');
 
     } catch (error) {
         console.error("Invoice error:", error);
-        // Using a custom method instead of alert for better UI/UX in this environment
         console.log("Error: " + error.message);
     }
 
