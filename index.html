@@ -41,7 +41,7 @@
 
         /* Spinner Styling */
         .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.1);
+            border: 3px solid rgba(0, 0, 0, 0.1);
             width: 20px;
             height: 20px;
             border-radius: 50%;
@@ -112,7 +112,6 @@
                 id="invoiceCard" 
                 class="group relative w-full max-w-md bg-[#252525] border border-white/5 rounded-2xl overflow-hidden shadow-2xl cursor-pointer hover:border-white/20 transition-all duration-300"
             >
-                <!-- Premium PDF Visual Placeholder (Replaced non-working Iframe) -->
                 <div class="relative h-48 w-full bg-gradient-to-br from-gray-800 to-black flex items-center justify-center overflow-hidden pointer-events-none">
                     <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;"></div>
                     <div class="flex flex-col items-center gap-3">
@@ -125,7 +124,6 @@
                     <div class="absolute inset-0 bg-gradient-to-t from-[#252525] via-transparent to-transparent"></div>
                 </div>
 
-                <!-- Card Content -->
                 <div class="p-6">
                     <div class="flex justify-between items-start">
                         <div>
@@ -151,7 +149,6 @@
         const N8N_WEBHOOK_URL = "https://n8n.norkx.space/webhook/inv-sys";
         const params = new URLSearchParams(window.location.search);
 
-        // Core extraction
         let email = params.get("email") || params.get("name");
         if (email) email = decodeURIComponent(email);
 
@@ -176,7 +173,6 @@
             generateBtn.classList.add("opacity-50", "cursor-not-allowed");
         }
 
-        // Handle Download logic
         invoiceCard.addEventListener('click', () => {
             if (currentDocumentUrl) {
                 const link = document.createElement('a');
@@ -191,13 +187,11 @@
         generateBtn.addEventListener('click', async function() {
             if (!email) return;
 
-            // UI Reset
             btnText.classList.add('hidden');
             btnSpinner.classList.remove('hidden');
             generateBtn.disabled = true;
             resultContainer.classList.add('hidden');
 
-            // Show Toast
             toast.innerText = "Your invoice is being generated, wait a few seconds. Thank You!";
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
@@ -211,23 +205,26 @@
 
                 if (!response.ok) throw new Error(`Server returned ${response.status}`);
 
-                // CORE FIX: Detect if response is binary PDF or JSON
-                const contentType = response.headers.get("content-type");
+                const contentType = response.headers.get("content-type") || "";
 
-                if (contentType && contentType.includes("application/json")) {
-                    const data = await response.json();
-                    if (data.documentUrl || data.url) {
-                        currentDocumentUrl = data.documentUrl || data.url;
-                    } else {
-                        throw new Error("JSON response missing URL");
-                    }
-                } else {
-                    // It's a binary file (PDF)
+                // If it's a PDF or we're not explicitly sure it's JSON, treat as file
+                if (contentType.includes("application/pdf") || !contentType.includes("application/json")) {
                     const blob = await response.blob();
+                    if (blob.size === 0) throw new Error("Received empty file from server");
                     currentDocumentUrl = window.URL.createObjectURL(blob);
+                } else {
+                    // It is JSON
+                    const data = await response.json();
+                    const url = data.documentUrl || data.url || data.link;
+                    if (url) {
+                        currentDocumentUrl = url;
+                    } else {
+                        // If JSON doesn't have a URL, maybe it's a success message but we still need the file?
+                        // This fallback tries to handle cases where n8n sends JSON success but the file might be elsewhere
+                        throw new Error("Server confirmed success but provided no file link.");
+                    }
                 }
 
-                // Success
                 resultContainer.classList.remove('hidden');
                 btnSpinner.classList.add('hidden');
                 btnText.innerText = "Generate Invoice";
@@ -247,6 +244,5 @@
             }
         });
     </script>
-
 </body>
 </html>
