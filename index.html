@@ -14,7 +14,6 @@
             overflow-x: hidden;
         }
 
-        /* Notification Styling */
         #notification-toast {
             position: fixed;
             bottom: -100px;
@@ -39,7 +38,6 @@
             opacity: 1;
         }
 
-        /* Spinner Styling */
         .spinner {
             border: 3px solid rgba(0, 0, 0, 0.1);
             width: 20px;
@@ -55,29 +53,19 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Card Animation */
         .fade-in-up {
             animation: fadeInUp 0.6s ease-out forwards;
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body class="relative">
 
-    <!-- Dashboard Header Area -->
     <div class="flex flex-col w-full pt-10 px-10 gap-6">
-        
-        <!-- Top Row: User Name and Image -->
         <div class="flex justify-between items-end w-full">
             <div id="userDisplay" class="text-white text-3xl font-bold tracking-tight"></div>
             <div class="flex items-center">
@@ -90,10 +78,8 @@
             </div>
         </div>
 
-        <!-- Full-Width Divider Line -->
         <div class="h-px w-full bg-white/10"></div>
 
-        <!-- Action Area -->
         <div class="flex justify-end w-full">
             <div class="flex flex-col w-64">
                 <button 
@@ -106,7 +92,6 @@
             </div>
         </div>
 
-        <!-- Result Card Area (Appears after response) -->
         <div id="resultContainer" class="hidden w-full flex justify-end mt-8 fade-in-up">
             <div 
                 id="invoiceCard" 
@@ -142,7 +127,6 @@
         </div>
     </div>
 
-    <!-- Notification Toast -->
     <div id="notification-toast">Your invoice is being generated, wait a few seconds. Thank You!</div>
 
     <script>
@@ -208,20 +192,21 @@
                 const contentType = response.headers.get("content-type") || "";
 
                 // ======= FIXED LOGIC =======
-                // Treat everything that is not JSON as a file (Blob)
                 if (!contentType.includes("application/json")) {
+                    // Treat as binary PDF
                     const blob = await response.blob();
                     if (!blob || blob.size === 0) throw new Error("Received empty file from server");
                     currentDocumentUrl = window.URL.createObjectURL(blob);
                 } else {
-                    // It's JSON; use URL if provided
+                    // Treat as JSON but only after workflow finishes
                     const data = await response.json();
-                    const url = data.documentUrl || data.url || data.link;
-                    if (url) {
-                        currentDocumentUrl = url;
-                    } else {
-                        throw new Error("Server returned JSON but no file link was provided.");
+
+                    // Wait/retry if data has no documentUrl yet
+                    if (!data.documentUrl || data.documentUrl === "") {
+                        throw new Error("Server returned JSON but no file link was provided. Wait until n8n finishes processing.");
                     }
+
+                    currentDocumentUrl = data.documentUrl;
                 }
                 // ======= END FIXED LOGIC =======
 
