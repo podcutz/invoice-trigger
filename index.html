@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice Generator</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dobnqmfsg/image/upload/v1770995309/Screenshot_2026-02-13_151541-removebg-preview_ifdgq3.png">
+    <!-- Favicon - Sizes attribute added for potential scaling -->
+    <link rel="icon" type="image/png" sizes="192x192" href="https://res.cloudinary.com/dobnqmfsg/image/upload/v1770995309/Screenshot_2026-02-13_151541-removebg-preview_ifdgq3.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .fade-out {
@@ -39,11 +39,12 @@
     <div class="h-px w-full bg-white/10"></div>
 
     <!-- Generate Button Area -->
-    <div class="flex justify-end w-full">
+    <div id="buttonArea" class="flex justify-end w-full">
         <div class="flex flex-col w-64">
             <button   
                 id="generateBtn"  
-                class="flex items-center justify-center w-full px-6 py-3 bg-white text-black text-sm font-bold rounded-xl shadow-lg transition-all duration-200 active:scale-95 uppercase tracking-wider"
+                class="flex items-center justify-center w-full px-6 py-3 bg-white text-black text-sm font-bold rounded-xl shadow-lg transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
+                disabled
             >
                 <span id="btnText">Generate Invoice</span>
                 <div id="btnSpinner" class="hidden animate-spin border-2 border-black border-t-transparent rounded-full w-4 h-4"></div>
@@ -89,6 +90,7 @@ const N8N_WEBHOOK_URL = "https://n8n.norkx.space/webhook/inv-sys.2.01";
 
 const params = new URLSearchParams(window.location.search);
 
+// Determine email (checking both 'email' and 'name' parameter for fallback as per existing logic)
 let email = params.get("email") || params.get("name");
 if (email) email = decodeURIComponent(email);
 
@@ -99,6 +101,7 @@ if (userName) {
 }
 
 const generateBtn = document.getElementById('generateBtn');
+const buttonArea = document.getElementById('buttonArea');
 const btnText = document.getElementById('btnText');
 const btnSpinner = document.getElementById('btnSpinner');
 const resultContainer = document.getElementById('resultContainer');
@@ -107,6 +110,11 @@ const toast = document.getElementById('toast');
 const statusLine = document.getElementById('statusLine');
 
 let currentDocumentUrl = "";
+
+// Only enable the button if both email/name and user parameters are present
+if (email && userName) {
+    generateBtn.disabled = false;
+}
 
 function showToast() {
     toast.classList.remove('hidden', 'fade-out');
@@ -118,7 +126,7 @@ function showToast() {
             toast.classList.add('hidden');
             toast.classList.remove('flex', 'fade-out');
         }, 500);
-    }, 3500); // Start fade at 3.5s to complete by 4s
+    }, 3500); 
 }
 
 invoiceCard.addEventListener('click', () => {
@@ -128,7 +136,7 @@ invoiceCard.addEventListener('click', () => {
 });
 
 generateBtn.addEventListener('click', async function() {
-    if (!email) return;
+    if (!email || !userName) return;
 
     // Show processing toast
     showToast();
@@ -165,15 +173,19 @@ generateBtn.addEventListener('click', async function() {
         currentDocumentUrl = link;
         resultContainer.classList.remove('hidden');
         statusLine.classList.remove('hidden');
+        
+        // Hide the button area permanently after successful generation
+        buttonArea.classList.add('hidden');
 
     } catch (error) {
         console.error("Invoice error:", error);
         console.log("Error: " + error.message);
+        
+        // Reset button only on error
+        btnSpinner.classList.add('hidden');
+        btnText.classList.remove('hidden');
+        generateBtn.disabled = false;
     }
-
-    btnSpinner.classList.add('hidden');
-    btnText.classList.remove('hidden');
-    generateBtn.disabled = false;
 });
 </script>
 
