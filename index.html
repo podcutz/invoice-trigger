@@ -14,7 +14,6 @@
             overflow-x: hidden;
         }
 
-        /* Notification Toast */
         #notification-toast {
             position: fixed;
             bottom: -100px;
@@ -39,7 +38,6 @@
             opacity: 1;
         }
 
-        /* Spinner */
         .spinner {
             border: 3px solid rgba(0, 0, 0, 0.1);
             width: 20px;
@@ -55,7 +53,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Card Animation */
         .fade-in-up {
             animation: fadeInUp 0.6s ease-out forwards;
         }
@@ -68,163 +65,163 @@
 </head>
 <body class="relative">
 
-    <div class="flex flex-col w-full pt-10 px-10 gap-6">
-        <div class="flex justify-between items-end w-full">
-            <div id="userDisplay" class="text-white text-3xl font-bold tracking-tight"></div>
-            <div class="flex items-center">
-                <img 
-                    src="https://res.cloudinary.com/dobnqmfsg/image/upload/v1770995309/Screenshot_2026-02-13_151541-removebg-preview_ifdgq3.png" 
-                    alt="Logo" 
-                    class="h-16 w-auto object-contain"
-                    onerror="this.style.display='none'"
-                >
-            </div>
-        </div>
-
-        <div class="h-px w-full bg-white/10"></div>
-
-        <div class="flex justify-end w-full">
-            <div class="flex flex-col w-64">
-                <button 
-                    id="generateBtn"
-                    class="flex items-center justify-center w-full px-6 py-3 bg-white hover:bg-gray-200 text-black text-sm font-bold rounded-xl shadow-lg transition-all duration-200 active:scale-95 focus:outline-none uppercase tracking-wider"
-                >
-                    <span id="btnText">Generate Invoice</span>
-                    <div id="btnSpinner" class="hidden spinner"></div>
-                </button>
-            </div>
-        </div>
-
-        <div id="resultContainer" class="hidden w-full flex justify-end mt-8 fade-in-up">
-            <div 
-                id="invoiceCard" 
-                class="group relative w-full max-w-md bg-[#252525] border border-white/5 rounded-2xl overflow-hidden shadow-2xl cursor-pointer hover:border-white/20 transition-all duration-300"
+<div class="flex flex-col w-full pt-10 px-10 gap-6">
+    <div class="flex justify-between items-end w-full">
+        <div id="userDisplay" class="text-white text-3xl font-bold tracking-tight"></div>
+        <div class="flex items-center">
+            <img 
+                src="https://res.cloudinary.com/dobnqmfsg/image/upload/v1770995309/Screenshot_2026-02-13_151541-removebg-preview_ifdgq3.png" 
+                alt="Logo" 
+                class="h-16 w-auto object-contain"
+                onerror="this.style.display='none'"
             >
-                <div class="relative h-48 w-full bg-gradient-to-br from-gray-800 to-black flex items-center justify-center overflow-hidden pointer-events-none">
-                    <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;"></div>
-                    <div class="flex flex-col items-center gap-3">
-                        <svg class="w-16 h-16 text-white/80" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
-                            <path d="M3 8a2 2 0 012-2v10h8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
-                        </svg>
-                        <span class="text-white/60 text-xs font-bold uppercase tracking-widest">Preview Ready</span>
-                    </div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-[#252525] via-transparent to-transparent"></div>
-                </div>
-
-                <div class="p-6">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-400 text-xs uppercase font-bold tracking-widest mb-1">Generated Document</p>
-                            <h3 class="text-white text-xl font-semibold">report.pdf</h3>
-                        </div>
-                        <div class="bg-white/10 p-2 rounded-lg group-hover:bg-white group-hover:text-black transition-colors duration-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-gray-500 text-sm mt-4 italic">Click anywhere on this card to download your file.</p>
-                </div>
-            </div>
         </div>
     </div>
 
-    <div id="notification-toast">Your invoice is being generated, wait a few seconds. Thank You!</div>
+    <div class="h-px w-full bg-white/10"></div>
 
-    <script>
-        const N8N_WEBHOOK_URL = "https://n8n.norkx.space/webhook/inv-sys";
-        const params = new URLSearchParams(window.location.search);
+    <div class="flex justify-end w-full">
+        <div class="flex flex-col w-64">
+            <button 
+                id="generateBtn"
+                class="flex items-center justify-center w-full px-6 py-3 bg-white hover:bg-gray-200 text-black text-sm font-bold rounded-xl shadow-lg transition-all duration-200 active:scale-95 focus:outline-none uppercase tracking-wider"
+            >
+                <span id="btnText">Generate Invoice</span>
+                <div id="btnSpinner" class="hidden spinner"></div>
+            </button>
+        </div>
+    </div>
 
-        let email = params.get("email") || params.get("name");
-        if (email) email = decodeURIComponent(email);
+    <div id="resultContainer" class="hidden w-full flex justify-end mt-8 fade-in-up">
+        <div 
+            id="invoiceCard" 
+            class="group relative w-full max-w-md bg-[#252525] border border-white/5 rounded-2xl overflow-hidden shadow-2xl cursor-pointer hover:border-white/20 transition-all duration-300"
+        >
+            <div class="relative h-48 w-full bg-gradient-to-br from-gray-800 to-black flex items-center justify-center overflow-hidden pointer-events-none">
+                <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;"></div>
+                <div class="flex flex-col items-center gap-3">
+                    <svg class="w-16 h-16 text-white/80" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
+                        <path d="M3 8a2 2 0 012-2v10h8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+                    </svg>
+                    <span class="text-white/60 text-xs font-bold uppercase tracking-widest">Preview Ready</span>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#252525] via-transparent to-transparent"></div>
+            </div>
 
-        let userName = params.get("user");
-        if (userName) {
-            userName = decodeURIComponent(userName);
-            document.getElementById("userDisplay").innerText = userName;
-        }
+            <div class="p-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-400 text-xs uppercase font-bold tracking-widest mb-1">Generated Document</p>
+                        <h3 class="text-white text-xl font-semibold">report.pdf</h3>
+                    </div>
+                    <div class="bg-white/10 p-2 rounded-lg group-hover:bg-white group-hover:text-black transition-colors duration-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-gray-500 text-sm mt-4 italic">Click anywhere on this card to download your file.</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-        const generateBtn = document.getElementById('generateBtn');
-        const btnText = document.getElementById('btnText');
-        const btnSpinner = document.getElementById('btnSpinner');
-        const toast = document.getElementById('notification-toast');
-        const resultContainer = document.getElementById('resultContainer');
-        const invoiceCard = document.getElementById('invoiceCard');
+<div id="notification-toast">Your invoice is being generated, wait a few seconds. Thank You!</div>
 
-        let currentDocumentUrl = "";
+<script>
+const N8N_WEBHOOK_URL = "https://n8n.norkx.space/webhook/inv-sys";
+const params = new URLSearchParams(window.location.search);
 
-        if (!email) {
-            generateBtn.disabled = true;
-            generateBtn.innerText = "Invalid Access";
-            generateBtn.classList.add("opacity-50", "cursor-not-allowed");
-        }
+let email = params.get("email") || params.get("name");
+if (email) email = decodeURIComponent(email);
 
-        invoiceCard.addEventListener('click', () => {
-            if (currentDocumentUrl) {
-                const link = document.createElement('a');
-                link.href = currentDocumentUrl;
-                link.download = 'Invoice.pdf';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
+let userName = params.get("user");
+if (userName) {
+    userName = decodeURIComponent(userName);
+    document.getElementById("userDisplay").innerText = userName;
+}
+
+const generateBtn = document.getElementById('generateBtn');
+const btnText = document.getElementById('btnText');
+const btnSpinner = document.getElementById('btnSpinner');
+const toast = document.getElementById('notification-toast');
+const resultContainer = document.getElementById('resultContainer');
+const invoiceCard = document.getElementById('invoiceCard');
+
+let currentDocumentUrl = "";
+
+if (!email) {
+    generateBtn.disabled = true;
+    generateBtn.innerText = "Invalid Access";
+    generateBtn.classList.add("opacity-50", "cursor-not-allowed");
+}
+
+invoiceCard.addEventListener('click', () => {
+    if (currentDocumentUrl) {
+        const link = document.createElement('a');
+        link.href = currentDocumentUrl;
+        link.download = 'Invoice.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+});
+
+generateBtn.addEventListener('click', async function() {
+    if (!email) return;
+
+    btnText.classList.add('hidden');
+    btnSpinner.classList.remove('hidden');
+    generateBtn.disabled = true;
+    resultContainer.classList.add('hidden');
+
+    toast.innerText = "Your invoice is being generated, wait a few seconds. Thank You!";
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+
+    try {
+        const response = await fetch(N8N_WEBHOOK_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email })
         });
 
-        generateBtn.addEventListener('click', async function() {
-            if (!email) return;
+        if (!response.ok) throw new Error(`Server returned ${response.status}`);
 
-            btnText.classList.add('hidden');
-            btnSpinner.classList.remove('hidden');
-            generateBtn.disabled = true;
-            resultContainer.classList.add('hidden');
+        const contentType = response.headers.get("content-type") || "";
 
-            toast.innerText = "Your invoice is being generated, wait a few seconds. Thank You!";
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-
-            try {
-                // Wait indefinitely until n8n responds
-                const response = await fetch(N8N_WEBHOOK_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email: email })
-                });
-
-                if (!response.ok) throw new Error(`Server returned ${response.status}`);
-
-                const contentType = response.headers.get("content-type") || "";
-
-                if (!contentType.includes("application/json")) {
-                    // Binary PDF
-                    const blob = await response.blob();
-                    if (!blob || blob.size === 0) throw new Error("Received empty file from server");
-                    currentDocumentUrl = window.URL.createObjectURL(blob);
-                } else {
-                    // JSON response
-                    const data = await response.json();
-                    if (!data.documentUrl) throw new Error("Server returned JSON but no file link was provided.");
-                    currentDocumentUrl = data.documentUrl;
-                }
-
-                resultContainer.classList.remove('hidden');
-                btnSpinner.classList.add('hidden');
-                btnText.innerText = "Generate Invoice";
-                btnText.classList.remove('hidden');
-                generateBtn.disabled = false;
-
-            } catch (error) {
-                console.error("Error:", error);
-                toast.innerText = `Error: ${error.message}`;
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 5000);
-
-                btnSpinner.classList.add('hidden');
-                btnText.innerText = "Error - Try Again";
-                btnText.classList.remove('hidden');
-                generateBtn.disabled = false;
+        if (!contentType.includes("application/json")) {
+            const blob = await response.blob();
+            if (!blob || blob.size === 0) throw new Error("Received empty file from server");
+            currentDocumentUrl = window.URL.createObjectURL(blob);
+        } else {
+            const data = await response.json();
+            // n8n returns an array
+            if (!Array.isArray(data) || !data[0].documentUrl) {
+                throw new Error("Server returned JSON but no file link was provided.");
             }
-        });
-    </script>
+            currentDocumentUrl = data[0].documentUrl;
+        }
+
+        resultContainer.classList.remove('hidden');
+        btnSpinner.classList.add('hidden');
+        btnText.innerText = "Generate Invoice";
+        btnText.classList.remove('hidden');
+        generateBtn.disabled = false;
+
+    } catch (error) {
+        console.error("Error:", error);
+        toast.innerText = `Error: ${error.message}`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 5000);
+
+        btnSpinner.classList.add('hidden');
+        btnText.innerText = "Error - Try Again";
+        btnText.classList.remove('hidden');
+        generateBtn.disabled = false;
+    }
+});
+</script>
 </body>
 </html>
