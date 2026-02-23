@@ -343,18 +343,21 @@ const response = await fetch('https://n8n.norkx.space/webhook/invsys3.0', {
         setTimeout(() => lockScreen.remove(), 500);
 
         // --- Set account name ---
-        const accountNameEl = document.querySelector('#accountRef p:first-child');
-        if (accountNameEl) accountNameEl.textContent = data.result.Name;
+const accountNameEl = document.querySelector('#accountRef p:first-child');
+if (accountNameEl) accountNameEl.textContent = data.result.Name;
 
-        // --- Set clients for table ---
-        window.clients = data.clients.map((c, idx) => ({
-            id: `client-${idx}-${Date.now()}`,
-            name: c.client,
-            status: 'Active',
-            pm: 'Alex Rivera',
-            products: c.products,
-            projects: [] // initially empty
-        }));
+// --- Store JWT from response ---
+window.jwtToken = data.jwt || '';
+
+// --- Set clients for table ---
+window.clients = data.clients.map((c, idx) => ({
+    id: `client-${idx}-${Date.now()}`,
+    name: c.client,
+    status: 'Active',
+    pm: 'Alex Rivera',
+    products: c.products,
+    projects: [] // initially empty
+}));
 
         // Set client options for main row dropdown
         window.clientOptions = window.clients.map(c => c.name);
@@ -671,14 +674,17 @@ const accountName =
 
 try {
     const response = await fetch("https://n8n.norkx.space/webhook/invsys3.1", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            timestamp: new Date().toISOString(),
-            accountHolder: accountName,
-            data: payload
-        })
-    });
+    method: "POST",
+    headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${window.jwtToken || ''}`
+    },
+    body: JSON.stringify({
+        timestamp: new Date().toISOString(),
+        accountHolder: accountName,
+        data: payload
+    })
+});
 
     if (!response.ok) {
         throw new Error("Webhook failed");
