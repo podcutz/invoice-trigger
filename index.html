@@ -51,6 +51,12 @@
             min-width: 50px;
             width: 100%;
         }
+.content-placeholder {
+    color: #71717a; /* gray placeholder color */
+}
+.content-placeholder:focus {
+    color: #f5f5f5; /* normal text color when typing */
+}
         
         [contenteditable="true"]:not(:focus) {
             display: block;
@@ -515,8 +521,11 @@ let generatedInvoiceLink = null; // NEW
 <td class="py-4 px-6 align-top text-left">
     <div class="mt-1.5">
         <span contenteditable="true"
-              onblur="updateSubValue('${client.id}', ${p.id}, 'notes', this.innerText)"
-              class="text-zinc-400 text-xs">${p.notes || ''}</span>
+      class="text-zinc-400 text-xs ${p.notesIsPlaceholder ? 'content-placeholder' : ''}"
+      onfocus="handleNotesFocus(this, '${client.id}', ${p.id})"
+      onblur="handleNotesBlur(this, '${client.id}', ${p.id})">
+    ${p.notes || ''}
+</span>
     </div>
 </td>
                                             </tr>
@@ -560,13 +569,14 @@ let generatedInvoiceLink = null; // NEW
     const client = clients.find(c => c.id === clientId);
     if (client) {
         client.projects.push({
-    id: Date.now(),
-    projectName: 'New Project',
-    type: 'Select',  // <-- default placeholder
-    qty: 1,
-    notes: 'Enter your text here.',       // <-- new Notes field
-    completedAt: '-'
-});
+            id: Date.now(),
+            projectName: 'New Project',
+            type: 'Select',
+            qty: 1,
+            notes: 'Enter your text here',   // placeholder text
+            notesIsPlaceholder: true,        // flag for placeholder
+            completedAt: '-'
+        });
         renderTable();
     }
 }
@@ -761,7 +771,34 @@ function renderInvoiceView(accountName) {
 
     lucide.createIcons();
 }
+function handleNotesFocus(el, clientId, projectId) {
+    const client = clients.find(c => c.id === clientId);
+    const project = client?.projects.find(p => p.id === projectId);
+    if (project && project.notesIsPlaceholder) {
+        el.innerText = '';                 // clear placeholder
+        el.classList.remove('content-placeholder');
+        project.notesIsPlaceholder = false; // mark as real input
+    }
+}
+
+function handleNotesBlur(el, clientId, projectId) {
+    const client = clients.find(c => c.id === clientId);
+    const project = client?.projects.find(p => p.id === projectId);
+    if (project) {
+        const value = el.innerText.trim();
+        if (!value) {
+            // restore placeholder
+            project.notes = 'Enter your text here';
+            project.notesIsPlaceholder = true;
+            el.innerText = project.notes;
+            el.classList.add('content-placeholder');
+        } else {
+            project.notes = value;
+            project.notesIsPlaceholder = false;
+        }
+    }
+    renderTable(); // refresh table to reflect changes
+}
     </script>
 </body>
 </html>
-
