@@ -477,9 +477,10 @@ let generatedInvoiceLink = null; // NEW
                                 <table class="w-full text-left table-fixed">
                                     <thead>
                                         <tr class="border-b border-zinc-800">
-                                            <th class="py-3 pl-40 text-zinc-400 text-[9px] font-bold uppercase tracking-widest w-[60%]">Product</th>
-                                            <th class="py-3 px-6 text-zinc-400 text-[9px] font-bold uppercase tracking-widest text-right w-[40%]">Qty</th>
-                                        </tr>
+    <th class="py-3 pl-40 text-zinc-400 text-[9px] font-bold uppercase tracking-widest w-[40%]">Product</th>
+    <th class="py-3 px-6 text-zinc-400 text-[9px] font-bold uppercase tracking-widest text-right w-[20%]">Qty</th>
+    <th class="py-3 px-6 text-zinc-400 text-[9px] font-bold uppercase tracking-widest text-left w-[40%]">Notes</th>
+</tr>
                                     </thead>
                                     <tbody class="divide-y divide-zinc-800">
                                         ${client.projects.map(p => `
@@ -503,14 +504,21 @@ let generatedInvoiceLink = null; // NEW
                                                     </div>
                                                 </td>
                                                 <td class="py-4 px-6 align-top text-right">
-                                                    <div class="mt-1.5">
-                                                        <span contenteditable="true" 
-                                                              onkeydown="handleNumericKeydown(event)" 
-                                                              oninput="cleanNumericInput(this)"
-                                                              onblur="updateSubValue('${client.id}', ${p.id}, 'qty', this.innerText)" 
-                                                              class="text-zinc-400 text-xs">${p.qty || 1}</span>
-                                                    </div>
-                                                </td>
+    <div class="mt-1.5">
+        <span contenteditable="true" 
+              onkeydown="handleNumericKeydown(event)" 
+              oninput="cleanNumericInput(this)"
+              onblur="updateSubValue('${client.id}', ${p.id}, 'qty', this.innerText)" 
+              class="text-zinc-400 text-xs">${p.qty || 1}</span>
+    </div>
+</td>
+<td class="py-4 px-6 align-top text-left">
+    <div class="mt-1.5">
+        <span contenteditable="true"
+              onblur="updateSubValue('${client.id}', ${p.id}, 'notes', this.innerText)"
+              class="text-zinc-400 text-xs">${p.notes || ''}</span>
+    </div>
+</td>
                                             </tr>
                                         `).join('')}
                                     </tbody>
@@ -552,12 +560,13 @@ let generatedInvoiceLink = null; // NEW
     const client = clients.find(c => c.id === clientId);
     if (client) {
         client.projects.push({
-            id: Date.now(),
-            projectName: 'New Project',
-            type: 'Select',  // <-- default placeholder
-            qty: 1,
-            completedAt: '-'
-        });
+    id: Date.now(),
+    projectName: 'New Project',
+    type: 'Select',  // <-- default placeholder
+    qty: 1,
+    notes: '',       // <-- new Notes field
+    completedAt: '-'
+});
         renderTable();
     }
 }
@@ -642,11 +651,12 @@ async function handleGenerateInvoice() {
         if (!client.name || client.name === "Select") return;
 
         const validProjects = client.projects
-            .filter(p => p.type && p.type !== "Select")
-            .map(p => ({
-                product: p.type,
-                qty: Number(p.qty) || 1
-            }));
+    .filter(p => p.type && p.type !== "Select")
+    .map(p => ({
+        product: p.type,
+        qty: Number(p.qty) || 1,
+        notes: p.notes || ''
+    }));
 
         if (validProjects.length > 0) {
             payload.push({
