@@ -246,6 +246,10 @@
                     </div>
 
                     <div class="overflow-x-auto">
+<div id="notesSection" class="mt-4 mb-4">
+    <label for="invoiceNotes" class="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-1 block">Notes</label>
+    <textarea id="invoiceNotes" rows="3" class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-3 py-2 text-sm resize-none focus:outline-none focus:border-zinc-600" placeholder="Enter any notes here..."></textarea>
+</div>
                         <table class="w-full text-left border-collapse table-fixed">
                             <thead>
                                 <tr class="bg-zinc-900/30 border-b border-zinc-700">
@@ -655,6 +659,7 @@ async function handleGenerateInvoice() {
 
     // --- Build Structured Clean Payload ---
     const payload = [];
+const notes = document.getElementById('invoiceNotes')?.value?.trim() || '';
 
     clients.forEach(client => {
         // Skip default client
@@ -700,10 +705,11 @@ try {
         "Authorization": `Bearer ${window.jwtToken || ''}`
     },
     body: JSON.stringify({
-        timestamp: new Date().toISOString(),
-        accountHolder: accountName,
-        data: payload
-    })
+    timestamp: new Date().toISOString(),
+    accountHolder: accountName,
+    data: payload,
+    notes: notes
+})
 });
 
     if (!response.ok) {
@@ -737,6 +743,7 @@ renderInvoiceView(accountName);
 }
 function renderInvoiceView(accountName) {
     const tableContainer = document.getElementById('projectsTableContainer');
+document.getElementById('invoiceNotes').value = '';
 
     tableContainer.innerHTML = `
         <div class="overflow-x-auto">
