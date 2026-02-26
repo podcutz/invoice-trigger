@@ -493,9 +493,8 @@ let generatedInvoiceLink = null; // NEW
                                 <table class="w-full text-left table-fixed">
                                     <thead>
                                         <tr class="border-b border-zinc-800">
-    <th class="py-3 pl-40 text-zinc-400 text-[9px] font-bold uppercase tracking-widest w-[40%]">Product</th>
-    <th class="py-3 px-6 text-zinc-400 text-[9px] font-bold uppercase tracking-widest text-right w-[20%]">Qty</th>
-    <th class="py-3 px-6 text-zinc-400 text-[9px] font-bold uppercase tracking-widest text-left w-[40%]">Notes</th>
+    <th class="py-3 pl-40 text-zinc-400 text-[9px] font-bold uppercase tracking-widest w-[80%]">Product</th>
+<th class="py-3 px-6 text-zinc-400 text-[9px] font-bold uppercase tracking-widest text-right w-[20%]">Qty</th>
 </tr>
                                     </thead>
                                     <tbody class="divide-y divide-zinc-800">
@@ -528,16 +527,7 @@ let generatedInvoiceLink = null; // NEW
               class="text-zinc-400 text-xs">${p.qty || 1}</span>
     </div>
 </td>
-<td class="py-4 px-6 align-top text-left">
-    <div class="mt-1.5">
-        <span contenteditable="true"
-      class="text-zinc-400 text-xs ${p.notesIsPlaceholder ? 'content-placeholder' : ''}"
-      onfocus="handleNotesFocus(this, '${client.id}', ${p.id})"
-      onblur="handleNotesBlur(this, '${client.id}', ${p.id})">
-    ${p.notes || ''}
-</span>
-    </div>
-</td>
+
                                             </tr>
                                         `).join('')}
                                     </tbody>
@@ -580,12 +570,8 @@ let generatedInvoiceLink = null; // NEW
     if (client) {
         client.projects.push({
             id: Date.now(),
-            projectName: 'New Project',
             type: 'Select',
-            qty: 1,
-            notes: 'Enter your text here',   // placeholder text
-            notesIsPlaceholder: true,        // flag for placeholder
-            completedAt: '-'
+            qty: 1
         });
         renderTable();
     }
@@ -674,10 +660,9 @@ const notes = document.getElementById('invoiceNotes')?.value?.trim() || '';
         const validProjects = client.projects
     .filter(p => p.type && p.type !== "Select")
     .map(p => ({
-        product: p.type,
-        qty: Number(p.qty) || 1,
-        notes: p.notes || ''
-    }));
+    product: p.type,
+    qty: Number(p.qty) || 1
+}));
 
         if (validProjects.length > 0) {
             payload.push({
@@ -714,7 +699,7 @@ try {
     timestamp: new Date().toISOString(),
     accountHolder: accountName,
     data: payload,
-    notes: notes
+    ...(notes ? { notes } : {})
 })
 });
 
@@ -783,35 +768,7 @@ document.getElementById('invoiceNotes').value = '';
     `;
 
     lucide.createIcons();
-}
-function handleNotesFocus(el, clientId, projectId) {
-    const client = clients.find(c => c.id === clientId);
-    const project = client?.projects.find(p => p.id === projectId);
-    if (project && project.notesIsPlaceholder) {
-        el.innerText = '';                 // clear placeholder
-        el.classList.remove('content-placeholder');
-        project.notesIsPlaceholder = false; // mark as real input
-    }
-}
 
-function handleNotesBlur(el, clientId, projectId) {
-    const client = clients.find(c => c.id === clientId);
-    const project = client?.projects.find(p => p.id === projectId);
-    if (project) {
-        const value = el.innerText.trim();
-        if (!value) {
-            // restore placeholder
-            project.notes = 'Enter your text here';
-            project.notesIsPlaceholder = true;
-            el.innerText = project.notes;
-            el.classList.add('content-placeholder');
-        } else {
-            project.notes = value;
-            project.notesIsPlaceholder = false;
-        }
-    }
-    renderTable(); // refresh table to reflect changes
-}
     </script>
 </body>
 </html>
