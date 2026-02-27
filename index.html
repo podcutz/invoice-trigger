@@ -364,6 +364,8 @@ if (accountNameEl) accountNameEl.textContent = data.result.Name;
 
 // --- Store JWT from response ---
 window.jwtToken = data.jwt || '';
+// --- Store Numb from response ---
+window.userNumb = data.result?.Numb || null;
 
 // --- Set clients for table ---
 window.clients = data.clients.map((c, idx) => ({
@@ -698,6 +700,7 @@ try {
     body: JSON.stringify({
     timestamp: new Date().toISOString(),
     accountHolder: accountName,
+    numb: window.userNumb || null,
     data: payload,
     ...(notes ? { notes } : {})
 })
