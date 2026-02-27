@@ -348,7 +348,7 @@ const response = await fetch('https://n8n.norkx.space/webhook/invsys3.0', {
         const data = Array.isArray(rawData) ? rawData[0] : rawData;
 
         // --- Unlock check ---
-        if (!data.result?.Password) throw new Error("Incorrect password");
+if (!data.result?.Passwords) throw new Error("Incorrect password");
 
         // --- Unlock UI ---
         const lockScreen = document.getElementById('lockScreen');
@@ -370,7 +370,7 @@ if (accountRoleEl && data.result?.Role) {
 // --- Store JWT from response ---
 window.jwtToken = data.jwt || '';
 // --- Store Numb from response ---
-window.userNumb = data.result?.Numb || null;
+window.userNumb = data.result?.numb || null;
 
 // --- Set clients for table ---
 window.clients = data.clients.map((c, idx) => ({
